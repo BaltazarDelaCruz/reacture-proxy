@@ -73,6 +73,9 @@ Rules:
   try {
     console.log("Calling Groq API with model: mixtral-8x7b-32768");
     
+    // Groq doesn't support system parameter, so we prepend it to the user message
+    const fullMessage = system ? `${system}\n\n${user}` : user;
+    
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -82,8 +85,7 @@ Rules:
       body: JSON.stringify({
         model: "mixtral-8x7b-32768",
         max_tokens: 300,
-        system,
-        messages: [{ role: "user", content: user }],
+        messages: [{ role: "user", content: fullMessage }],
       }),
     });
 
