@@ -71,7 +71,7 @@ Rules:
   }
 
   try {
-    console.log("Calling Groq API with model: mixtral-8x7b-32768");
+    console.log("Calling Groq API with model: llama-3.1-70b-versatile");
     
     // Groq doesn't support system parameter, so we prepend it to the user message
     const fullMessage = system ? `${system}\n\n${user}` : user;
@@ -83,7 +83,7 @@ Rules:
         "Authorization": `Bearer ${GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "mixtral-8x7b-32768",
+        model: "llama-3.1-70b-versatile",
         max_tokens: 300,
         messages: [{ role: "user", content: fullMessage }],
       }),
