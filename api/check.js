@@ -60,28 +60,27 @@ Rules:
     });
   }
 
-  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-  if (!ANTHROPIC_API_KEY) {
-    console.error("ANTHROPIC_API_KEY not configured");
+  if (!GROQ_API_KEY) {
+    console.error("GROQ_API_KEY not configured");
     return res.status(500).json({ 
       error: "API key not configured on server",
-      hint: "Please set ANTHROPIC_API_KEY in Vercel environment variables"
+      hint: "Please set GROQ_API_KEY in Vercel environment variables"
     });
   }
 
   try {
-    console.log("Calling Anthropic API with model: claude-3-5-sonnet-20241022");
+    console.log("Calling Groq API with model: mixtral-8x7b-32768");
     
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "claude-3-5-sonnet-20241022",
+        model: "mixtral-8x7b-32768",
         max_tokens: 300,
         system,
         messages: [{ role: "user", content: user }],
@@ -90,19 +89,19 @@ Rules:
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("Anthropic API error:", response.status, errText);
+      console.error("Groq API error:", response.status, errText);
       return res.status(response.status).json({ 
-        error: "Anthropic API error",
+        error: "Groq API error",
         status: response.status,
         details: errText 
       });
     }
 
     const data = await response.json();
-    const text = data.content?.[0]?.text || "";
+    const text = data.choices?.[0]?.message?.content || "";
 
     if (!text) {
-      console.warn("Empty response from Anthropic API");
+      console.warn("Empty response from Groq API");
       return res.status(200).json({ text: "PASS: Code looks good!" });
     }
 
